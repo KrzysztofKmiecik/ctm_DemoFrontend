@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<!--suppress SpellCheckingInspection, SpellCheckingInspection -->
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>mainFixturesView</title>
+    <link rel="stylesheet" href="/webjars/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/webjars/font-awesome/5.11.2/css/all.min.css">
+    <link rel="stylesheet" href="/webjars/font-awesome/5.11.2/css/v4-shims.min.css">
+</head>
+<body>
+
+
+<div class="container my-5">
+    <div class="row">
+        <div class="col">
+            <h1 th:text="Discoveries">Fixtures</h1>
+            <a th:align="right" th:href="@{/discoveries}" th:text="Discoveries.list" >Fixture list</a>
+        </div>
+
+
+        <div class="col">
+            <a href="https://aptiv.com" target="_blank" title="https://aptiv.com">
+                <img src="#" th:src="@{/photos/ctm_logo.svg}" width="200" height="45" alt="aptiv" th:align="right"/>
+            </a>
+            <br>
+            <p th:align="right"><label> Gdynia Poland Kmiecik 1.0</label></p>
+        </div>
+
+    </div>
+
+    <div class="row">
+
+       <div class="col-md-8" align="left">
+            <form th:action="@{/search}" method="post" th:object="${searchDto}">
+                <label for="searchString"></label>
+                <input type="text" id="searchString" name="searchString" th:field="*{searchString}">
+                <input type="submit" th:value="SearchByPackageID">
+
+            </form>
+        </div>
+
+    </div>
+
+    <div class="row">
+        <div class="col-12 mx-auto">
+            <table class="table table-striped table-hover table-sm">
+                <thead>
+                <tr>
+                    <th th:text="DiscoveryID">DiscoveryID</th>
+                    <th th:text="PackageID">PackageID</th>
+                    <th th:text="Uri">Uri</th>
+                    <th th:text="BuoyNumber">eBuoyNumber</th>
+                    <th th:text="DetectionTimestamp">DetectionTimestamp</th>
+                    <th th:text="MissionNumber">MissionNumber()</th>
+                    <th th:text="DetectionRms">DetectionRms</th>
+                    <th th:text="DELETE">delete</th>
+
+                </tr>
+                </thead>
+
+                <tr th:each="discovery:${allDiscoveries}">
+                    <td th:text="${discovery.getId()}">Id</td>
+                    <td th:text="${discovery.getPackageId}">PackageId</td>
+                    <td th:text="${discovery.getUri()}">Uri</td>
+                    <td th:text="${discovery.getBuoyNumber()}">Buoy</td>
+                    <td th:text="${discovery.getDetectionTimestamp.toString()}">DetectionTimestamp</td>
+                    <td th:text="${discovery.getMissionNumber()}">MissionNumber</td>
+                    <td th:text="${discovery.getDetectionRms()}">DetectionRms</td>
+                    <td>
+                            <form th:action="@{delete-discoveries}" th:object="${newDiscovery}" method="post">
+                                <input name="id" type="hidden" th:value="${discovery.getId()}">
+                                <input name="packageId" type="hidden" th:value="${discovery.getPackageId}">
+                                <button name="action" type="submit" th:text="DELETE" class="btn btn-primary btn-block">Delete</button>
+                            </form>
+                    </td>
+                </tr>
+
+            </table>
+
+                <form th:action="@{/add-discovery}" th:object="${newDiscovery}" method="post">
+
+                    <button type="submit" th:text="ADD" class="btn btn-primary btn-block">Add discovery</button>
+                </form>
+
+        </div>
+    </div>
+</div>
+
+
+<script src="/webjars/jquery/3.0.0/jquery.min.js"></script>
+<script src="/webjars/popper.js/1.14.3/popper.min.js"></script>
+<script src="/webjars/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+<h2>3313e90c-d1ef-11ec-9d64-0242ac120002</h2>
+<h2>3313e90c-d1ef-11ec-9d64-0242ac120003</h2>
+</body>
+</html>

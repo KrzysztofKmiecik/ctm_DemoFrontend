@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<!--suppress SpellCheckingInspection, SpellCheckingInspection -->
+<html xmlns:th="http://www.thymeleaf.org" lang="en"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
+<head>
+    <meta charset="UTF-8">
+    <title>mainFixturesView</title>
+    <link rel="stylesheet" href="/webjars/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/webjars/font-awesome/5.11.2/css/all.min.css">
+    <link rel="stylesheet" href="/webjars/font-awesome/5.11.2/css/v4-shims.min.css">
+</head>
+<body>
+
+
+<div class="container my-5">
+    <div class="row">
+        <div class="col">
+            <h1 th:text="#{fixture.fixtures}">Fixtures</h1>
+            <a th:align="right" th:href="@{/fixtures}" th:text="#{fixture.list}" >Fixture list</a>
+        </div>
+        <div class="col-4">
+            <a href="?lang=pl_PL" th:text="#{language.polish}"></a>|
+            <a href="?lang=en_GB" th:text="#{language.english}"></a>|
+            <a href="?lang=de_DE" th:text="#{language.german}"></a>|
+            <a href="?lang=ru_RU" th:text="#{language.russian}"></a>
+
+        </div>
+
+        <div class="col">
+            <a href="https://aptiv.com" target="_blank" title="https://aptiv.com">
+                <img src="#" th:src="@{/photos/delphi.png}" width="200" height="45" alt="aptiv" th:align="right"/>
+            </a>
+            <br>
+            <p th:align="right"><label> Gdańsk Poland kmk 1.0</label></p>
+        </div>
+        <div class="float-right">
+            <a th:href="@{/logout}" th:text="#{user.security.logout}" class="btn btn-outline-secondary btn-sm ml-3">Logout</a>
+        </div>
+    </div>
+
+    <div sec:authorize="isAuthenticated()">
+        <span sec:authentication="name">Bob</span>
+        <span sec:authentication="principal.authorities">[ROLE_USER, ROLE_TESTER,ROLE_QUALITY]</span>
+
+    </div>
+
+    <div class="row">
+        <div class="col-12 mx-auto">
+            <table class="table table-striped table-hover table-sm">
+                <thead>
+                <tr>
+                    <th>Id</th>
+                    <th th:text="#{fixture.name}">name</th>
+                    <th th:text="#{fixture.fis}">Fis_Process</th>
+                    <th th:text="#{fixture.status}">status_strain</th>
+                    <th th:text="#{fixture.expired}">expired_date_strain</th>
+                    <th th:text="#{fixture.edit}">edit</th>
+                    <th th:text="#{fixture.delete}">delete</th>
+                    <th th:text="#{fixture.ok}">set_status_OK</th>
+                    <th th:text="#{fixture.nok}">set_status_NOK</th>
+                </tr>
+                </thead>
+
+                <tr th:each="discovery:${allDiscoveries}">
+                    <td><a href="#" th:href="@{/fixture/{id}(id= ${fixture.getId()})}"
+                           th:text="${discovery.getId()}">fixtureById</a></td>
+                    <td th:text="${discovery.getName()}">Name</td>
+                    <td th:text="${fixture.getFisProcess()}">FisProcess</td>
+                    <td th:style="${fixture.getStatusStrain().toString()=='OK'?'color:green;':'color:red;'}"
+                        th:text="${fixture.getStatusStrain()}">Status
+                    </td>
+                    <td th:text="${fixture.getExpiredDateStrain()}"></td>
+                    <td>
+                        <div sec:authorize="hasRole('ROLE_TESTER')">
+                            <form th:action="@{edit-fixtureButton}" th:object="${newFixture}" method="post">
+                                <input name="id" type="hidden" th:value="${fixture.getId()}">
+                                <button name="action" type="submit" th:text="#{button.edit}" class="btn btn-primary btn-block">Edit</button>
+                            </form>
+                        </div>
+                    </td>
+                    <td>
+                        <div sec:authorize="hasRole('ROLE_TESTER')">
+                            <form th:action="@{delete-fixtureButton}" th:object="${newFixture}" method="post">
+                                <input name="id" type="hidden" th:value="${fixture.getId()}">
+                                <button name="action" type="submit" th:text="#{button.delete}" class="btn btn-primary btn-block">Delete</button>
+                            </form>
+                        </div>
+
+                    </td>
+
+                    <td>
+                        <div sec:authorize="hasRole('ROLE_QUALITY')">
+                            <form th:action="@{setOK-fixtureButton}" th:object="${newFixture}" method="post">
+                                <input name="id" type="hidden" th:value="${fixture.getId()}" >
+                                <button name="action" type="submit" th:text="#{button.ok}" class="btn btn-primary btn-block">SetOK</button>
+                                <label for="setOKdescr"></label><input style='width:100%' id="setOKdescr" type="text" th:field="*{descriptionOfChange}" th:placeholder="#{fixture.placeholder}" pattern="[a-zA-Z0-9]+[:][a-zA-Z0-9]+" autocomplete="off" required>
+                            </form>
+                        </div>
+                    </td>
+
+                    <td>
+                        <form th:action="@{setNOK-fixtureButton}" th:object="${newFixture}" method="post">
+                            <input name="id" type="hidden" th:value="${fixture.getId()}" >
+
+                            <button name="action" type="submit" th:text="#{button.nok}" class="btn btn-primary btn-block">SetNOK</button>
+                            <label for="setNokdescr"></label><input style='width:100%' id="setNokdescr" type="text" th:field="*{descriptionOfChange}" th:placeholder="#{fixture.placeholder}" pattern="[a-zA-Z0-9]+[:]{1}[a-zA-Z0-9]+" autocomplete="off" required >
+
+                        </form>
+                    </td>
+                </tr>
+
+            </table>
+            <div sec:authorize="hasRole('ROLE_TESTER')">
+                <form th:action="@{/add-fixtureButton}" th:object="${newFixture}" method="post">
+
+                    <button type="submit" th:text="#{button.add}" class="btn btn-primary btn-block">Add fixture</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script src="/webjars/jquery/3.0.0/jquery.min.js"></script>
+<script src="/webjars/popper.js/1.14.3/popper.min.js"></script>
+<script src="/webjars/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+</body>
+</html>
