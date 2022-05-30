@@ -26,7 +26,7 @@ public class SearchController {
         Random r=new Random();
         double y=19.1+ (19.5-19.1)*r.nextDouble();
         double x=55.1+(55.7-55.1)*r.nextDouble();
-        Ship ship=new Ship(y, x, "Wykrycie",ShipStatus.FRIEND,x, y,50,new PositionCoordinate(y, x));
+        Ship ship=new Ship(y*(aisLocation.longitude())/ aisLocation.longitude(), x*(aisLocation.latitude())/ aisLocation.latitude(), "Wykrycie",ShipStatus.FRIEND,x, y,50,new PositionCoordinate(y, x));
 
         List<Ship> tracks = Arrays.asList(ship);
         model.addAttribute("tracks", tracks);
