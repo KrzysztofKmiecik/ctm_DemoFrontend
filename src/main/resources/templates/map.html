@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
-    <meta http-equiv="refresh" content="1">
+ <!-- <meta http-equiv="refresh" content="1">!-->
     <link rel="stylesheet" type="text/css"
           href="webjars/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css"
           th:href="@{/webjars/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css}"/>
@@ -86,7 +86,7 @@
             radius: value.visibilityInKm
         }).addTo(map);
 
-        L.polygon([[xPos, yPos], [value.lastPosition.x, value.lastPosition.y],]).addTo(map)
+     //   L.polygon([[xPos, yPos], [value.lastPosition.x, value.lastPosition.y],]).addTo(map)
 
 
         var myIcon;
