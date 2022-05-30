@@ -16,7 +16,7 @@ public class ServiceApiImpl implements ServiceApi {
         HttpEntity httpEntity = new HttpEntity(httpHeaders);
         //   ParameterizedTypeReference<PackageDiscoveryDTO[]> typeRef = new ParameterizedTypeReference<PackageDiscoveryDTO[]>() {};
 
-        final String POSITION_URL = "http://localhost:8888/packages/"+packageId+"/discoveries";
+        final String POSITION_URL = "http://ingestdatamanager-ctm:5001/packages/"+packageId+"/discoveries";
         ResponseEntity<PackageDiscoveryDTO[]> exchange = restTemplate.exchange(POSITION_URL,
                 HttpMethod.GET,
                 httpEntity,
@@ -31,7 +31,7 @@ public class ServiceApiImpl implements ServiceApi {
         HttpEntity<Object> httpEntity = new HttpEntity<Object>(httpHeaders);
         //   ParameterizedTypeReference<PackageDiscoveryDTO[]> typeRef = new ParameterizedTypeReference<PackageDiscoveryDTO[]>() {};
 
-        final String POSITION_URL = "http://localhost:8888/packages/"+packageId+"/discoveries/"+discoveryId;
+        final String POSITION_URL = "http://ingestdatamanager-ctm:5001/packages/"+packageId+"/discoveries/"+discoveryId;
         ResponseEntity<String> exchange = restTemplate.exchange(POSITION_URL,
                 HttpMethod.DELETE,
                 httpEntity,
@@ -50,7 +50,7 @@ public class ServiceApiImpl implements ServiceApi {
         HttpEntity<Object> httpEntity = new HttpEntity<Object>(json,httpHeaders);
         //   ParameterizedTypeReference<PackageDiscoveryDTO[]> typeRef = new ParameterizedTypeReference<PackageDiscoveryDTO[]>() {};
 
-        final String POSITION_URL = "http://localhost:8888/packages/"+packageId+"/discoveries";
+        final String POSITION_URL = "http://ingestdatamanager-ctm:5001/packages/"+packageId+"/discoveries";
         ResponseEntity<String> exchange = restTemplate.exchange(POSITION_URL,
                 HttpMethod.POST,
                 httpEntity,

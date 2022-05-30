@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <meta http-equiv="refresh" content="65">
+    <link rel="stylesheet" type="text/css"
+          href="webjars/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css"
+          th:href="@{/webjars/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css}"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/0.2.3/leaflet.draw.css"/>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+          integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+          crossorigin=""/>
+
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+            integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+            crossorigin=""></script>
+
+    <!-- ruller !-->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/gokertanrisever/leaflet-ruler@master/src/leaflet-ruler.css"
+          integrity="sha384-P9DABSdtEY/XDbEInD3q+PlL+BjqPCXGcF8EkhtKSfSTr/dS5PBKa9+/PMkW2xsY" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/gh/gokertanrisever/leaflet-ruler@master/src/leaflet-ruler.js"
+            integrity="sha384-N2S8y7hRzXUPiepaSiUvBH1ZZ7Tc/ZfchhbPdvOE5v3aBBCIepq9l+dBJPFdo1ZJ"
+            crossorigin="anonymous"></script>
+
+    <style>#map {
+        height: 760px;
+    }</style>
+</head>
+<body>
+<div class="container my-5">
+    <div class="col">
+        <a href="https://aptiv.com" target="_blank" title="https://aptiv.com">
+            <img src="#" th:src="@{/photos/ctm_logo.svg}" width="200" height="45" alt="aptiv" th:align="right"/>
+        </a>
+        <br>
+        <p th:align="right"><label> Gdynia Poland Kmiecik 1.0</label></p>
+    </div>
+<div id="map"></div>
+</div>
+
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    let serverContext = /*[[@{/}]]*/
+    /*]]>*/
+
+
+    var map = L.map('map').setView([55.6, 19.24], 7);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+
+
+    var tracks = [[${tracks}]];
+
+
+    var badShipIcon = L.icon({
+        iconUrl: 'https://img.icons8.com/external-others-maxicons/2x/external-military-battlefield-others-maxicons-6.png',
+        iconSize: [50, 55],
+        iconAnchor: [22, 40],
+        popupAnchor: [0, -30],
+
+
+    })
+    var friendShipIcon = L.icon({
+        iconUrl: 'https://img.icons8.com/external-others-maxicons/2x/external-military-battlefield-others-maxicons-3.png',
+        iconSize: [50, 55],
+        iconAnchor: [22, 40],
+        popupAnchor: [0, -30],
+
+    })
+
+
+    tracks.forEach(value => {
+        var polygon;
+        var xPos = value.x;
+        var yPos = value.y;
+
+
+        var circle = L.circle([xPos, yPos], {
+            color: 'blue',
+            fillColor: 'rgba(255,0,51,0.09)',
+            fillOpacity: 0.5,
+            radius: value.visibilityInKm
+        }).addTo(map);
+
+        L.polygon([[xPos, yPos], [value.lastPosition.x, value.lastPosition.y],]).addTo(map)
+
+
+        var myIcon;
+        if (value.shipStatus == 'FRIEND') {
+            myIcon = friendShipIcon;
+        } else {
+            myIcon = badShipIcon;
+        }
+
+        var marker = L.marker([xPos, yPos], {icon: myIcon,}).addTo(map)
+
+            .on('mouseover', () => {
+                marker.bindPopup("<b>Name</b>:" + value.name
+                    + "<br> <b>STATUS</b>:" + value.shipStatus
+                    + "<br> <b>Visibility[km]</b>:" + value.visibilityInKm
+                    + "<br> <b>PosX:</b>" + value.x
+                    + "<br> <b>PosY:</b>" + value.y
+                    + "<br> <b>DestinationX:</b>" + value.destinationX
+                    + "<br> <b>DestinationY:</b>" + value.destinationY
+                ).openPopup();
+                polygon = L.polygon([
+                    [value.x, value.y],
+                    [value.destinationX, value.destinationY],
+                ]).addTo(map);
+            })
+            .on('mouseout', () => {
+                map.removeLayer(polygon);
+            })
+
+            .on('click', () => {
+                marker.setIcon(friendShipIcon);
+                value.shipStatus = 'FRIEND';
+                var form_data = new FormData();
+                form_data.append('y', value.y);
+                form_data.append('x', value.x);
+                form_data.append('name', value.name);
+                form_data.append('shipStatus', 'FRIEND');
+                form_data.append('destinationY', value.destinationY);
+                form_data.append('destinationX', value.destinationX);
+                form_data.append('visibilityInKm', value.visibilityInKm);
+
+
+                $.ajax({
+                    url: serverContext + 'update',
+                    data: form_data,
+                    processData: false,
+                    contentType: false,
+                    type: 'POST',
+                    success: function (data) {
+                        console.log(data)
+                    }
+                });
+
+            })
+            .on('dblclick', () => {
+                marker.setIcon(badShipIcon);
+                value.shipStatus = 'ENEMY';
+                var form_data = new FormData();
+                form_data.append('y', value.y);
+                form_data.append('x', value.x);
+                form_data.append('name', value.name);
+                form_data.append('shipStatus', 'ENEMY');
+                form_data.append('destinationY', value.destinationY);
+                form_data.append('destinationX', value.destinationX);
+                form_data.append('visibilityInKm', value.visibilityInKm);
+
+
+                $.ajax({
+                    url: serverContext + 'update',
+                    data: form_data,
+                    processData: false,
+                    contentType: false,
+                    type: 'POST',
+                    success: function (data) {
+                        console.log(data)
+                    }
+                });
+            })
+
+
+    })
+
+    L.control.ruler().addTo(map);
+    L.control.scale().addTo(map);
+
+
+</script>
+<script type="text/javascript"
+        src="webjars/tether/1.4.0/dist/js/tether.min.js"
+        th:src="@{/webjars/tether/1.4.0/dist/js/tether.min.js}"></script>
+<!-- /.container -->
+<script type="text/javascript" src="webjars/jquery/3.2.0/jquery.min.js"
+        th:src="@{/webjars/jquery/3.2.0/jquery.min.js}"></script>
+<script type="text/javascript"
+        src="webjars/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js"
+        th:src="@{/webjars/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js}"></script>
+</body>
+</html>
