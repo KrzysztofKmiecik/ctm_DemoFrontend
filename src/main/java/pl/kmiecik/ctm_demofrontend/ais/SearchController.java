@@ -21,12 +21,15 @@ public class SearchController {
         System.out.println();
         List<SearchingResult> location = serviceAis.getLocation();
         Location aisLocation = location.get(0).getLocation();
-      // Ship ship=new Ship(10.174,63.48,"Wykrycie",ShipStatus.FRIEND,10.174,63.48,50,new PositionCoordinate(10.132, 64.712));
+        String description = location.get(0).getDescription();
+        // Ship ship=new Ship(10.174,63.48,"Wykrycie",ShipStatus.FRIEND,10.174,63.48,50,new PositionCoordinate(10.132, 64.712));
         //Ship ship=new Ship(19.24, 55.6, "Wykrycie",ShipStatus.FRIEND,19.24, 55.6,50,new PositionCoordinate(55.6, 19.24));
         Random r=new Random();
-        double y=19.1+ (19.5-19.1)*r.nextDouble();
-        double x=55.1+(55.7-55.1)*r.nextDouble();
-        Ship ship=new Ship(y*(aisLocation.longitude())/ aisLocation.longitude(), x*(aisLocation.latitude())/ aisLocation.latitude(), "Wykrycie",ShipStatus.FRIEND,x, y,50,new PositionCoordinate(y, x));
+       // double y=19.1+ (19.5-19.1)*r.nextDouble();
+       // double x=55.1+(55.7-55.1)*r.nextDouble();
+        double y=aisLocation.longitude();
+        double x=aisLocation.latitude();
+        Ship ship=new Ship(y, x, description,ShipStatus.FRIEND,x, y,50,new PositionCoordinate(y, x));
 
         List<Ship> tracks = Arrays.asList(ship);
         model.addAttribute("tracks", tracks);
